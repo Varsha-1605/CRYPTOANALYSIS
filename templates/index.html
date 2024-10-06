@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptocurrency Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Cryptocurrency Analysis</h1>
+    <select id="crypto-dropdown">
+        {% for crypto in crypto_list %}
+        <option value="{{ crypto }}">{{ crypto }}</option>
+        {% endfor %}
+    </select>
+    <div id="graph"></div>
+
+    <script>
+        $(document).ready(function() {
+            function updateGraph() {
+                var selectedCrypto = $('#crypto-dropdown').val();
+                $.ajax({
+                    url: '/get_graph',
+                    type: 'POST',
+                    data: {crypto: selectedCrypto},
+                    success: function(response) {
+                        var graphJSON = JSON.parse(response.graphJSON);
+                        Plotly.newPlot('graph', graphJSON.data, graphJSON.layout);
+                    }
+                });
+            }
+
+            $('#crypto-dropdown').change(updateGraph);
+            updateGraph();  // Initial graph load
+        });
+    </script>
+</body>
+</html>
